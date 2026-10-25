@@ -14,10 +14,12 @@
   let isEditing: boolean = $state(false);
   let originalValue: string;
   let buttonRef: any = $state();
+  let inputRef: any = $state();
 
   function startEdit() {
     isEditing = true;
     originalValue = value;
+    inputRef.focus();
   }
 
   function cancelEdit() {
@@ -55,19 +57,19 @@
       <textarea
         class="inline-input"
         aria-label="{label} text area"
+        bind:this={inputRef}
         bind:value
         onblur={commitEdit}
-        onkeydown={handleInputKeydown}
-        autofocus></textarea>
+        onkeydown={handleInputKeydown}></textarea>
     {:else}
       <input
         class="inline-input"
         aria-label="{label} input"
         {type}
+        bind:this={inputRef}
         bind:value
         onblur={commitEdit}
         onkeydown={handleInputKeydown}
-        autofocus
       />
     {/if}
   {:else}
