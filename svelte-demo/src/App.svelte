@@ -1,89 +1,74 @@
-<script>
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from './assets/vite.svg'
-  import heroImg from './assets/hero.png'
-  import Counter from './lib/Counter.svelte'
+<script lang="ts">
+  import { onMount } from "svelte";
+  import Post from "./lib/Post.svelte";
+  import TagList from "./lib/TagList.svelte";
+  let name = $state("world");
+  let posts: Post[] = [];
+  let filteredPosts: Post[] = $state([]);
+  let searchString = "";
+  let tags = $state([]);
+  const url = "https://dummyjson.com/posts/";
+
+  function getTagList(posts: Post[]) {
+    const allTags = posts.map((post: Post) => post.tags).flat();
+    const uniqueTags = new Set(allTags);
+    return [...uniqueTags];
+  }
+
+  async function getPosts(url: string) {
+    const response = await fetch(url);
+    return response.json();
+  }
+  async function init() {
+    const data = await getPosts(url);
+    posts = data.posts;
+    filteredPosts = posts;
+    console.log(data);
+    tags = getTagList(posts);
+  }
+
+  function search(term) {
+    searchString = term;
+    console.log("searchHandler", term, searchString);
+    filteredPosts = posts.filter((post) => {
+      return (
+        post.title.toLowerCase().includes(searchString.toLowerCase()) ||
+        post.body.toLowerCase().includes(searchString.toLowerCase()) ||
+        post.tags.some((tag) =>
+          tag.toLowerCase().includes(searchString.toLowerCase()),
+        )
+      );
+    });
+  }
+
+  function handleSearchKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      search(searchString);
+    }
+  }
+
+  onMount(() => init());
 </script>
 
-<section id="center">
-  <div class="hero">
-    <img src={heroImg} class="base" width="170" height="179" alt="" />
-    <img src={svelteLogo} class="framework" alt="Svelte logo" />
-    <img src={viteLogo} class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/App.svelte</code> and save to test <code>HMR</code></p>
-  </div>
-  <Counter />
-</section>
+<main>
+  <h1>Hello!</h1>
+  <section>
+    <label for="search"> Search Posts </label>
+    <input
+      type="text"
+      bind:value={searchString}
+      onkeydown={handleSearchKeydown}
+    /><button onclick={() => search(searchString)}>Search</button>
+    <TagList {tags} handleClick={search} />
+  </section>
+  {#each filteredPosts as post}
+    <Post {post} />
+  {/each}
+</main>
 
-<div class="ticks"></div>
-
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#documentation-icon"></use>
-    </svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank" rel="noreferrer">
-          <img class="logo" src={viteLogo} alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://svelte.dev/" target="_blank" rel="noreferrer">
-          <img class="button-icon" src={svelteLogo} alt="" />
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true">
-      <use href="/icons.svg#social-icon"></use>
-    </svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li>
-        <a href="https://github.com/vitejs/vite" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#github-icon"></use>
-          </svg>
-          GitHub
-        </a>
-      </li>
-      <li>
-        <a href="https://chat.vite.dev/" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#discord-icon"></use>
-          </svg>
-          Discord
-        </a>
-      </li>
-      <li>
-        <a href="https://x.com/vite_js" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#x-icon"></use>
-          </svg>
-          X.com
-        </a>
-      </li>
-      <li>
-        <a href="https://bsky.app/profile/vite.dev" target="_blank" rel="noreferrer">
-          <svg class="button-icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#bluesky-icon"></use>
-          </svg>
-          Bluesky
-        </a>
-      </li>
-    </ul>
-  </div>
-</section>
-
-<div class="ticks"></div>
-<section id="spacer"></section>
+<style>
+  main {
+    font-family: courier;
+  }
+</style>
