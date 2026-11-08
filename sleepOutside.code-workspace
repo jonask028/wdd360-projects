@@ -1,11 +1,11 @@
 {
-	"folders": [
-		{
-			"path": "team-3-activity"
-		},
-		{
-			"path": "sleepoutsideServer"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "sleepoutsideClient",
+    },
+    {
+      "path": "sleepoutsideServer",
+    },
+  ],
+  "settings": {},
 }

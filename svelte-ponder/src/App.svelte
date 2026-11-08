@@ -3,7 +3,7 @@
   import viteLogo from "./assets/vite.svg";
   import heroImg from "./assets/hero.png";
   import Counter from "./lib/Counter.svelte";
-  import Login from "./lib/Login.svelte";
+  import Login from "../../sleepoutsideClient/src/components/Login.svelte";
   import UserProfile from "./js/components/UserProfile.svelte";
 </script>
 
